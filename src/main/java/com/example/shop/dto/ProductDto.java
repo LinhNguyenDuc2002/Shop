@@ -21,7 +21,7 @@ import java.util.List;
 public class ProductDto {
     private Long id;
 
-    @JsonProperty("product-name")
+    @JsonProperty("product_name")
     private String productName;
 
     @JsonProperty("price")
@@ -36,7 +36,7 @@ public class ProductDto {
     @JsonProperty("sold")
     private Long sold;
 
-    @JsonProperty("update-day")
+    @JsonProperty("update_day")
     private Date update_day;
 
     @JsonProperty("note")
