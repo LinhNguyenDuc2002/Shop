@@ -106,6 +106,10 @@ CREATE TABLE image(
 );
 
 INSERT INTO category values(1,"Phone","...");
+INSERT INTO category values(2,"Ipad","...");
+INSERT INTO category values(3,"Laptop","...");
+INSERT INTO category values(4,"TV","...");
+INSERT INTO category values(5,"Tủ lạnh","...");
 
 INSERT into role values(1,"USER");
 INSERT into role values(2,"EMPLOYEE");
