@@ -1,6 +1,10 @@
 package com.example.shop.cache;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +13,11 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@Table(name = "temp_user")
-@Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "temp_user")
 public class TempUser {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -33,6 +37,5 @@ public class TempUser {
 
     private String otp;
 
-    @Column(name = "create_at")
     private Date createdAt;
 }

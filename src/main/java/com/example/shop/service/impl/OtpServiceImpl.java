@@ -1,14 +1,18 @@
 package com.example.shop.service.impl;
 
+import com.example.shop.cache.TempUser;
 import com.example.shop.config.MailConfig;
 import com.example.shop.constant.ResponseMessage;
-import com.example.shop.cache.TempUser;
 import com.example.shop.exception.NotFoundException;
 import com.example.shop.exception.ValidationException;
 import com.example.shop.repository.TempUserRepository;
 import com.example.shop.service.OtpService;
 import com.example.shop.util.DateUtil;
-import jakarta.mail.*;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;

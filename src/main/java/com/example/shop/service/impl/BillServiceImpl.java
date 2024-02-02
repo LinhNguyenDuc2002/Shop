@@ -7,12 +7,14 @@ import com.example.shop.dto.response.PageResponse;
 import com.example.shop.entity.Address;
 import com.example.shop.entity.Bill;
 import com.example.shop.entity.Detail;
+import com.example.shop.entity.Product;
 import com.example.shop.entity.User;
 import com.example.shop.exception.NotFoundException;
 import com.example.shop.mapper.AddressMapper;
 import com.example.shop.mapper.BillMapper;
 import com.example.shop.repository.BillRepository;
 import com.example.shop.repository.DetailRepository;
+import com.example.shop.repository.ProductRepository;
 import com.example.shop.repository.UserRepository;
 import com.example.shop.service.BillService;
 import com.example.shop.util.PageUtil;
@@ -37,6 +39,9 @@ public class BillServiceImpl implements BillService {
     private DetailRepository detailRepository;
 
     @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Transactional
@@ -44,6 +49,7 @@ public class BillServiceImpl implements BillService {
     public BillDto create(Long id, BillRequest billRequest) throws NotFoundException {
         log.info("Create a bill of user {}", id);
 
+        //user
         User user = userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("User {} don't exist", id);
@@ -52,8 +58,10 @@ public class BillServiceImpl implements BillService {
                             .build();
                 });
 
+        //address
         Address address = AddressMapper.INSTANCE.toEntity(billRequest.getAddress());
 
+        //create bill
         List<Detail> details = detailRepository.findAllById(billRequest.getDetails());
 
         Bill bill = Bill.builder()
@@ -65,10 +73,15 @@ public class BillServiceImpl implements BillService {
                 .build();
         billRepository.save(bill);
 
+        //update detail and product
         detailRepository.saveAllAndFlush(details.stream()
                 .map(detail -> {
                     detail.setBill(bill);
                     detail.setStatus(true);
+
+                    Product product = detail.getProduct();
+                    product.setQuantity(product.getQuantity() - detail.getQuantity());
+                    product.setSold(product.getSold() + detail.getQuantity());
                     return detail;
                 })
                 .collect(Collectors.toList()));

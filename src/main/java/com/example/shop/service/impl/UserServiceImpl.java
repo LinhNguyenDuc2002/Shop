@@ -1,11 +1,11 @@
 package com.example.shop.service.impl;
 
+import com.example.shop.cache.TempUser;
 import com.example.shop.constant.ResponseMessage;
 import com.example.shop.dto.UserDto;
 import com.example.shop.dto.request.PasswordRequest;
 import com.example.shop.dto.request.UserRequest;
 import com.example.shop.entity.Role;
-import com.example.shop.cache.TempUser;
 import com.example.shop.entity.User;
 import com.example.shop.exception.NotFoundException;
 import com.example.shop.exception.ValidationException;
@@ -15,11 +15,12 @@ import com.example.shop.repository.TempUserRepository;
 import com.example.shop.repository.UserRepository;
 import com.example.shop.service.OtpService;
 import com.example.shop.service.UserService;
-import com.example.shop.util.SecurityUtil;
 import com.example.shop.util.OtpUtil;
+import com.example.shop.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -86,7 +90,7 @@ public class UserServiceImpl implements UserService {
         tempUserRepository.save(tempUser);
 
         log.info("OTP code is sent successfully");
-        session.setAttribute("user", tempUser.getId());
+        session.setAttribute("user", tempUser.getId().toString());
     }
 
     @Override
