@@ -2,6 +2,7 @@ package com.example.shop.service.impl;
 
 import com.example.shop.constant.ResponseMessage;
 import com.example.shop.dto.BillDto;
+import com.example.shop.dto.request.AddressRequest;
 import com.example.shop.dto.request.BillRequest;
 import com.example.shop.dto.response.PageResponse;
 import com.example.shop.entity.Address;
@@ -61,6 +62,11 @@ public class BillServiceImpl implements BillService {
         //address
         Address address = AddressMapper.INSTANCE.toEntity(billRequest.getAddress());
 
+        String phone = user.getPhone();
+        if(billRequest.getPhone() != null && !billRequest.getPhone().isEmpty()) {
+            phone = billRequest.getPhone();
+        }
+
         //create bill
         List<Detail> details = detailRepository.findAllById(billRequest.getDetails());
 
@@ -68,6 +74,7 @@ public class BillServiceImpl implements BillService {
                 .address(address)
                 .user(user)
                 .details(details)
+                .phone(phone)
                 .active(false)
                 .purchaseDate(new Date())
                 .build();
@@ -87,6 +94,33 @@ public class BillServiceImpl implements BillService {
                 .collect(Collectors.toList()));
 
         log.info("Created a bill of user {} successfully", id);
+        return BillMapper.INSTANCE.toDto(bill);
+    }
+
+    @Override
+    public BillDto update(Long id, AddressRequest addressRequest) throws NotFoundException {
+        log.info("Update bill {}", id);
+
+        Bill bill = billRepository.findById(id)
+                .orElseThrow(() -> {
+                    return NotFoundException.builder()
+                            .message(ResponseMessage.BILL_NOT_FOUND.getMessage())
+                            .build();
+                });
+
+        if(!bill.isActive()) {
+            Address address = bill.getAddress();
+
+            address.setCity(addressRequest.getCity());
+            address.setSpecificAddress(addressRequest.getSpecificAddress());
+            address.setDistrict(addressRequest.getDistrict());
+            address.setWard(addressRequest.getWard());
+            address.setCountry(addressRequest.getCountry());
+
+            log.info("Updated bill {} successfully", id);
+            billRepository.save(bill);
+        }
+
         return BillMapper.INSTANCE.toDto(bill);
     }
 

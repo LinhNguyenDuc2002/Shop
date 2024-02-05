@@ -1,5 +1,6 @@
 package com.example.shop.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +31,9 @@ public class Bill {
 
     @Column(name = "purchase_date")
     private Date purchaseDate;
+
+    @JsonProperty("receiver_phone")
+    private String phone;
 
     private boolean active;
 
