@@ -44,9 +44,8 @@ public class UserController {
 
     @PostMapping("/verify")
     public ResponseEntity<CommonResponse<UserDto>> verifyOTPToCreateUser(@RequestParam(name = "code") String otp,
-                                                                         HttpSession session) throws NotFoundException, ValidationException {
-        otpService.verifyOTP(otp, session);
-        return ResponseUtil.wrapResponse(userService.createUser(session), ResponseMessage.CREATE_USER_SUCCESS.getMessage());
+                                                                         HttpSession session) throws ValidationException {
+        return ResponseUtil.wrapResponse(userService.createUser(otp, session), ResponseMessage.CREATE_USER_SUCCESS.getMessage());
     }
 
     @PostMapping()

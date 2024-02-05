@@ -29,6 +29,12 @@ spring:
   mvc:
     throw-exception-if-no-handler-found: true
 
+  data:
+    # redis cache
+    redis:
+      host: localhost
+      port: 6379
+
 # OTP
 mail:
   smtp:
@@ -62,8 +68,6 @@ tempUser:
   lifespan: 12
 
 # Swagger: http://localhost:8080/api/swagger-ui/index.html
-
-# redis cache
 
 
 

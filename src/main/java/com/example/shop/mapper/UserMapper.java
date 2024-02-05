@@ -22,7 +22,5 @@ public interface UserMapper {
     @Named("toDtoWithoutAddress")
     UserDto toDtoWithoutAddress(User user);
 
-    UserDto toDto(TempUser tempUser);
-
     List<UserDto> toDtoList(List<User> users);
 }
