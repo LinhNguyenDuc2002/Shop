@@ -22,7 +22,7 @@ public interface UserService {
 
     UserDto update(Long id, UserRequest userRequest) throws NotFoundException, ValidationException;
 
-    UserDto createUser(HttpSession session) throws NotFoundException;
+    UserDto createUser(String otp, HttpSession session) throws ValidationException;
 
     void changePwd(Long id, PasswordRequest passwordRequest) throws NotFoundException, ValidationException;
 

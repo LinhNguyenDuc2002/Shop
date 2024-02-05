@@ -1,25 +1,27 @@
 package com.example.shop.service.impl;
 
+import com.example.shop.cache.TempUser;
+import com.example.shop.config.ApplicationConfig;
+import com.example.shop.constant.CommonConstant;
 import com.example.shop.constant.ResponseMessage;
 import com.example.shop.dto.UserDto;
 import com.example.shop.dto.request.PasswordRequest;
 import com.example.shop.dto.request.UserRequest;
 import com.example.shop.entity.Role;
-import com.example.shop.cache.TempUser;
 import com.example.shop.entity.User;
 import com.example.shop.exception.NotFoundException;
 import com.example.shop.exception.ValidationException;
 import com.example.shop.mapper.UserMapper;
 import com.example.shop.repository.RoleRepository;
-import com.example.shop.repository.TempUserRepository;
 import com.example.shop.repository.UserRepository;
 import com.example.shop.service.OtpService;
 import com.example.shop.service.UserService;
-import com.example.shop.util.SecurityUtil;
 import com.example.shop.util.OtpUtil;
+import com.example.shop.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -36,13 +40,13 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private TempUserRepository tempUserRepository;
-
-    @Autowired
     private OtpService otpService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -74,19 +78,21 @@ public class UserServiceImpl implements UserService {
         }
 
         TempUser tempUser = convertToTempUser(newUserRequest);
-        Calendar calendar = Calendar.getInstance();
 
         String otp = OtpUtil.generateOTP();
-        log.info("Sending OTP to authenticate ...");
-        otpService.sendOTP(tempUser.getEmail(), tempUser.getUsername(), otp);
-
         tempUser.setCreatedAt(new Date());
         tempUser.setOtp(otp);
 
-        tempUserRepository.save(tempUser);
+        log.info("Sending OTP to authenticate ...");
+        otpService.sendOTP(tempUser.getEmail(), tempUser.getUsername(), otp);
+
+        redisTemplate.opsForValue().set(tempUser.getId(),
+                                        tempUser,
+                                        CommonConstant.existedTimeTempUser,
+                                        TimeUnit.MINUTES);
 
         log.info("OTP code is sent successfully");
-        session.setAttribute("user", tempUser.getId());
+        session.setAttribute("user", tempUser.getId().toString());
     }
 
     @Override
@@ -161,24 +167,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(HttpSession session) throws NotFoundException {
-        log.info("Create a new user");
+    public UserDto createUser(String otp, HttpSession session) throws ValidationException {
+        log.info("Verifying otp ...");
         String id = session.getAttribute("user").toString();
 
-        TempUser tempUser = tempUserRepository.findById(Long.valueOf(id))
-                .orElseThrow(()->{
-                    log.error("No registration information found");
-
-                    return NotFoundException.builder()
-                            .message(ResponseMessage.USER_NOT_FOUND.getMessage())
-                            .build();
-        });
+        TempUser tempUser = (TempUser) redisTemplate.opsForValue().get(id);
+        if(tempUser == null || !otp.equals(tempUser.getOtp())) {
+            log.error("OTP code is invalid or expired");
+            throw ValidationException.builder()
+                    .errorObject(otp)
+                    .message(ResponseMessage.INVALID_OTP.getMessage())
+                    .build();
+        }
 
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByRoleName("ROLE_USER"));
 
         User user = convertToUser(tempUser);
-        tempUserRepository.deleteById(tempUser.getId());
+        redisTemplate.delete(id);
 
         user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -255,6 +261,7 @@ public class UserServiceImpl implements UserService {
 
     public TempUser convertToTempUser(UserRequest newUserRequest) {
         return TempUser.builder()
+                .id(UUID.randomUUID().toString())
                 .username(newUserRequest.getUsername())
                 .password(newUserRequest.getPassword())
                 .fullname(newUserRequest.getFullname())

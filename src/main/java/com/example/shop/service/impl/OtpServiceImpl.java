@@ -1,19 +1,23 @@
 package com.example.shop.service.impl;
 
+import com.example.shop.cache.TempUser;
 import com.example.shop.config.MailConfig;
 import com.example.shop.constant.ResponseMessage;
-import com.example.shop.cache.TempUser;
 import com.example.shop.exception.NotFoundException;
 import com.example.shop.exception.ValidationException;
-import com.example.shop.repository.TempUserRepository;
 import com.example.shop.service.OtpService;
 import com.example.shop.util.DateUtil;
-import jakarta.mail.*;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -27,31 +31,11 @@ public class OtpServiceImpl implements OtpService {
     private MailConfig mailConfig;
 
     @Autowired
-    private TempUserRepository tempUserRepository;
+    private RedisTemplate redisTemplate;
 
     @Override
-    public void verifyOTP(String otp, HttpSession session) throws ValidationException, NotFoundException {
-        log.info("Verifying otp ...");
-        String id = session.getAttribute("user").toString();
-        Date currentDate = new Date();
+    public void verifyOTP(String otp, HttpSession session) {
 
-        TempUser tempUser = tempUserRepository.findById(Long.valueOf(id))
-                .orElseThrow(()->{
-                    log.error("Info of registration user was not found");
-                    return NotFoundException.builder()
-                            .message(ResponseMessage.USER_NOT_FOUND.getMessage())
-                            .build();
-                });
-
-        if(currentDate.after(DateUtil.add(tempUser.getCreatedAt(), Calendar.MINUTE, 5)) || !otp.equals(tempUser.getOtp())) {
-            log.error("OTP code is invalid or expired");
-            throw ValidationException.builder()
-                    .errorObject(otp)
-                    .message(ResponseMessage.INVALID_OTP.getMessage())
-                    .build();
-        }
-
-        log.info("Verified otp successfully");
     }
 
     @Override
