@@ -16,7 +16,7 @@ import java.util.Date;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductRequest {
-    @JsonProperty("product-name")
+    @JsonProperty("product_name")
     @Size(min = 1, message = "Product name cannot be empty")
     @NotNull(message = "Product name cannot be null")
     private String productName;
