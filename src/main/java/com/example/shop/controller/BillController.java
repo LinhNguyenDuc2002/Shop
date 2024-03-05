@@ -3,6 +3,7 @@ package com.example.shop.controller;
 import com.example.shop.constant.ResponseMessage;
 import com.example.shop.constant.ParameterConstant;
 import com.example.shop.dto.BillDto;
+import com.example.shop.dto.request.AddressRequest;
 import com.example.shop.dto.request.BillRequest;
 import com.example.shop.dto.response.CommonResponse;
 import com.example.shop.dto.response.PageResponse;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +41,14 @@ public class BillController {
                                                           BindingResult bindingResult) throws ValidationException, NotFoundException {
         HandleBindingResult.handle(bindingResult, billRequest);
         return ResponseUtil.wrapResponse(billService.create(id, billRequest), ResponseMessage.CREATE_BILL_SUCCESS.getMessage());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CommonResponse<BillDto>> update(@PathVariable Long id,
+                                                          @Valid @RequestBody AddressRequest addressRequest,
+                                                          BindingResult bindingResult) throws ValidationException, NotFoundException {
+        HandleBindingResult.handle(bindingResult, addressRequest);
+        return ResponseUtil.wrapResponse(billService.update(id, addressRequest), ResponseMessage.CREATE_BILL_SUCCESS.getMessage());
     }
 
     @GetMapping

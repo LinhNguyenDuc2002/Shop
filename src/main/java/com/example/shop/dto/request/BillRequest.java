@@ -19,6 +19,9 @@ public class BillRequest {
     @NotNull
     private AddressRequest address;
 
+    @JsonProperty("receiver_phone")
+    private String phone;
+
     @JsonProperty("orders")
     @NotNull
     @NotEmpty
