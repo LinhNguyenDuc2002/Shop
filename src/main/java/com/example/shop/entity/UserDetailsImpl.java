@@ -21,7 +21,7 @@ public class UserDetailsImpl implements UserDetails {
         this.password = user.getPassword();
         this.roles = user.getRoles()
                 .stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                 .collect(Collectors.toList());
     }
 

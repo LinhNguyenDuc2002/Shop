@@ -1,5 +1,7 @@
 package com.example.shop.entity;
 
+import com.example.shop.RoleType;
+import com.example.shop.converter.RoleTypeConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +23,8 @@ public class Role {
     private Long id;
 
     @Column(name = "role_name")
-    private String roleName;
+    @Convert(converter = RoleTypeConverter.class)
+    private RoleType roleName;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude

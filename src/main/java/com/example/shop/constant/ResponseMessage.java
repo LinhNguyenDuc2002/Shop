@@ -32,6 +32,8 @@ public enum ResponseMessage {
 
     EMAIL_EXISTS("Email already exists"),
 
+    EMAIL_INVALID("Email is invalid"),
+
     WAIT_ENTER_OTP("Waiting for enter otp"),
 
     GET_ALL_CATEGORY_SUCCESS("Got all categories successfully"),

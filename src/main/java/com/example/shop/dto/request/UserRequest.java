@@ -47,4 +47,8 @@ public class UserRequest {
     @Size(min = 1, message = "Phone cannot be empty")
     @NotNull(message = "Phone cannot be null")
     private String phone;
+
+    @JsonProperty("role")
+    @NotNull(message = "Role cannot be null")
+    private String role;
 }
