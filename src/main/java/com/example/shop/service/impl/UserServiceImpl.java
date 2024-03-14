@@ -1,5 +1,6 @@
 package com.example.shop.service.impl;
 
+import com.example.shop.RoleType;
 import com.example.shop.cache.TempUser;
 import com.example.shop.config.ApplicationConfig;
 import com.example.shop.constant.CommonConstant;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -72,6 +74,10 @@ public class UserServiceImpl implements UserService {
     public void createTempUser(UserRequest newUserRequest, HttpSession session) throws ValidationException {
         log.info("Save registration information temporarily");
 
+        if(!StringUtils.hasText(newUserRequest.getEmail())) {
+            log.error("Email is invalid");
+            throw new ValidationException(newUserRequest, ResponseMessage.EMAIL_INVALID.getMessage());
+        }
         if(userRepository.existsByEmail(newUserRequest.getEmail())) {
             log.error("Email is already in use");
             throw new ValidationException(newUserRequest, ResponseMessage.EMAIL_EXISTS.getMessage());
@@ -181,7 +187,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByRoleName("ROLE_USER"));
+        roles.add(roleRepository.findByRoleName(RoleType.valueOf(tempUser.getRole())));
 
         User user = convertToUser(tempUser);
         redisTemplate.delete(id);
@@ -268,6 +274,7 @@ public class UserServiceImpl implements UserService {
                 .dob(newUserRequest.getDob())
                 .phone(newUserRequest.getPhone())
                 .email(newUserRequest.getEmail())
+                .role(newUserRequest.getRole())
                 .build();
     }
 }

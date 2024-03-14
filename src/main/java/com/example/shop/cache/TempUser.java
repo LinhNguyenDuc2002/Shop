@@ -31,5 +31,7 @@ public class TempUser implements Serializable {
 
     private String otp;
 
+    private String role;
+
     private Date createdAt;
 }
