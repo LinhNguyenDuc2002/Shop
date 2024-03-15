@@ -1,6 +1,6 @@
 package com.example.shop.converter;
 
-import com.example.shop.RoleType;
+import com.example.shop.constant.RoleType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.extern.slf4j.Slf4j;

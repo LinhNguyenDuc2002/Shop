@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,19 +52,16 @@ public class ProductServiceImpl implements ProductService {
     private Cloudinary cloudinary;
 
     @Override
-    public ProductDto add(String productRequest, MultipartFile file) throws NotFoundException, ValidationException {
+    public ProductDto add(String productRequest, List<MultipartFile> files) throws NotFoundException, ValidationException {
         log.info("Add a product");
-
-        ProductRequest newProduct = new ProductRequest();
-
-        try{
+        try {
             ObjectMapper objectMapper = new ObjectMapper();
+            ProductRequest newProduct = objectMapper.readValue(productRequest, ProductRequest.class);
 
-            newProduct = objectMapper.readValue(productRequest, ProductRequest.class);
-            if(newProduct == null ||
-                newProduct.getProductName() == null ||
-                newProduct.getQuantity() == null ||
-                newProduct.getPrice() == null) {
+            if (newProduct == null ||
+                    newProduct.getProductName() == null ||
+                    newProduct.getQuantity() == null ||
+                    newProduct.getPrice() == null) {
                 log.error("The request is invalid");
                 throw ValidationException.builder()
                         .message(ResponseMessage.INPUT_INVALID.getMessage())
@@ -71,7 +69,8 @@ public class ProductServiceImpl implements ProductService {
             }
 
             Product product = convertToProduct(newProduct);
-            Image image = uploadFile(file, ObjectUtils.emptyMap());
+            List<Image> images = uploadFile(files);
+            imageRepository.saveAll(images);
 
             Category category = categoryRepository.findById(newProduct.getCategory())
                     .orElseThrow(() -> {
@@ -85,9 +84,8 @@ public class ProductServiceImpl implements ProductService {
             product.setUpdate_day(new Date());
             product.setCategory(category);
             productRepository.save(product);
-
-            image.setProduct(product);
-            imageRepository.save(image);
+            images.stream().forEach(image -> image.setProduct(product));
+            imageRepository.saveAll(images);
 
             log.info("Added a product successfully");
             return ProductMapper.INSTANCE.toDto(productRepository.findById(product.getId()).get());
@@ -104,12 +102,11 @@ public class ProductServiceImpl implements ProductService {
 
         int total = 1;
         List<Product> products;
-        if(pageable != null) {
+        if (pageable != null) {
             Page<Product> productPage = productRepository.findAll(pageable);
             products = productPage.getContent();
             total = productPage.getTotalPages();
-        }
-        else {
+        } else {
             products = productRepository.findAll();
         }
 
@@ -126,14 +123,14 @@ public class ProductServiceImpl implements ProductService {
         log.info("Get product {}", id);
 
         Product product = productRepository.findById(id)
-                .orElseThrow(()->{
+                .orElseThrow(() -> {
                     log.error("Product {0} don't exist", id);
                     return NotFoundException.builder()
                             .message(ResponseMessage.PRODUCT_NOT_FOUND.getMessage())
                             .build();
-        });
+                });
 
-        log.info("Got product {} successfully",id);
+        log.info("Got product {} successfully", id);
         return ProductMapper.INSTANCE.toDto(product);
     }
 
@@ -142,7 +139,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Delete product {}", id);
 
         boolean checkingProduct = productRepository.existsById(id);
-        if(!checkingProduct) {
+        if (!checkingProduct) {
             log.error("Product {} don't exist", id);
             throw new NotFoundException(ResponseMessage.PRODUCT_NOT_FOUND.getMessage());
         }
@@ -161,16 +158,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto update(Long id, String productRequest, MultipartFile file) throws NotFoundException {
+    public ProductDto update(Long id, String productRequest, List<MultipartFile> files) throws NotFoundException {
         log.info("Update product {}", id);
-
-        ProductRequest newProduct = new ProductRequest();
-
-        try{
+        try {
             ObjectMapper objectMapper = new ObjectMapper();
+            ProductRequest newProduct = objectMapper.readValue(productRequest, ProductRequest.class);
 
-            newProduct = objectMapper.readValue(productRequest, ProductRequest.class);
-            if(newProduct == null ||
+            if (newProduct == null ||
                     newProduct.getProductName() == null ||
                     newProduct.getQuantity() == null ||
                     newProduct.getPrice() == null) {
@@ -181,7 +175,7 @@ public class ProductServiceImpl implements ProductService {
             }
 
             Product product = productRepository.findById(id)
-                    .orElseThrow(()->{
+                    .orElseThrow(() -> {
                         log.error("Product {} don't exist", id);
                         return NotFoundException.builder()
                                 .message(ResponseMessage.PRODUCT_NOT_FOUND.getMessage())
@@ -196,7 +190,15 @@ public class ProductServiceImpl implements ProductService {
                                 .build();
                     });
 
-            if(file != null) {
+            product.setProductName(newProduct.getProductName());
+            product.setPrice(newProduct.getPrice());
+            product.setQuantity(newProduct.getQuantity());
+            product.setNote(newProduct.getNote());
+            product.setCategory(category);
+            product.setUpdate_day(new Date());
+            productRepository.save(product);
+
+            if (files != null) {
                 List<Image> images = product.getImages().stream().toList();
                 images.stream().forEach(a -> {
                     try {
@@ -207,20 +209,10 @@ public class ProductServiceImpl implements ProductService {
                 });
                 imageRepository.deleteAll(images);
 
-                Image image = uploadFile(file, ObjectUtils.emptyMap());
-                image.setProduct(product);
-                imageRepository.save(image);
-
-                product.setImages(List.of(image));
+                List<Image> imageFiles = uploadFile(files);
+                imageFiles.stream().forEach(image -> image.setProduct(product));
+                imageRepository.saveAll(imageFiles);
             }
-
-            product.setProductName(newProduct.getProductName());
-            product.setPrice(newProduct.getPrice());
-            product.setQuantity(newProduct.getQuantity());
-            product.setNote(newProduct.getNote());
-            product.setCategory(category);
-            product.setUpdate_day(new Date());
-            productRepository.save(product);
 
             log.info("Updated product {} successfully", id);
             return ProductMapper.INSTANCE.toDto(product);
@@ -250,7 +242,7 @@ public class ProductServiceImpl implements ProductService {
     public PageResponse<ProductDto> search(String key, Integer size, Integer page) {
         log.info("Search products by name '{}'", key);
 
-        if(key == null) {
+        if (key == null) {
             key = "";
         }
 
@@ -285,17 +277,21 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
-    private Image uploadFile(MultipartFile file, Map map) throws IOException {
-        Map data = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+    private List<Image> uploadFile(List<MultipartFile> files) throws IOException {
+        List<Image> images = new ArrayList<>();
+        for (MultipartFile file : files) {
+            Map data = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
 
-        return Image.builder()
+            images.add(Image.builder()
                     .format(data.get("format").toString())
                     .resourceType(data.get("resource_type").toString())
                     .secureUrl(data.get("secure_url").toString())
                     .createdAt(DateUtil.convertStringToDate(data.get("created_at").toString()))
                     .url(data.get("url").toString())
                     .publicId(data.get("public_id").toString())
-                    .build();
+                    .build());
+        }
+        return images;
     }
 
     private void destroyFile(String publicId, Map map) throws IOException {

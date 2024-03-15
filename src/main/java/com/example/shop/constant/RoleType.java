@@ -1,4 +1,4 @@
-package com.example.shop;
+package com.example.shop.constant;
 
 public enum RoleType {
     CUSTOMER,

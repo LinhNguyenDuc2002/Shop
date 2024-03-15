@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ProductService {
-    ProductDto add(String productRequest, MultipartFile file) throws ValidationException, NotFoundException;
+    ProductDto add(String productRequest, List<MultipartFile> files) throws ValidationException, NotFoundException;
 
     PageResponse<ProductDto> getAll(Integer size, Integer page);
 
@@ -18,7 +18,7 @@ public interface ProductService {
 
     void delete(Long id) throws NotFoundException;
 
-    ProductDto update(Long id, String productRequest, MultipartFile file) throws NotFoundException;
+    ProductDto update(Long id, String productRequest, List<MultipartFile> files) throws NotFoundException;
 
     PageResponse<ProductDto> getByCategoryId(Long id, Integer size, Integer page);
 
