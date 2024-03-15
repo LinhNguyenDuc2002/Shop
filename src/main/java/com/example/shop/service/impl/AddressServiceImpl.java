@@ -31,8 +31,6 @@ public class AddressServiceImpl implements AddressService {
                             .build();
         });
 
-
-
         if(user.getAddress() == null) {
             Address address = AddressMapper.INSTANCE.toEntity(addressRequest);
             user.setAddress(address);

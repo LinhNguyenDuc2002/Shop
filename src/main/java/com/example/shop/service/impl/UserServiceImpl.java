@@ -1,8 +1,7 @@
 package com.example.shop.service.impl;
 
-import com.example.shop.RoleType;
+import com.example.shop.constant.RoleType;
 import com.example.shop.cache.TempUser;
-import com.example.shop.config.ApplicationConfig;
 import com.example.shop.constant.CommonConstant;
 import com.example.shop.constant.ResponseMessage;
 import com.example.shop.dto.UserDto;
@@ -27,7 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;

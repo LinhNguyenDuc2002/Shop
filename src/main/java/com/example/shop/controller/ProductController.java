@@ -3,6 +3,7 @@ package com.example.shop.controller;
 import com.example.shop.constant.ResponseMessage;
 import com.example.shop.constant.ParameterConstant;
 import com.example.shop.dto.ProductDto;
+import com.example.shop.dto.request.ProductRequest;
 import com.example.shop.dto.response.CommonResponse;
 import com.example.shop.dto.response.PageResponse;
 import com.example.shop.exception.NotFoundException;
@@ -31,11 +32,11 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PostMapping(value = "", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(value = "", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CommonResponse<ProductDto>> add(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("product") String productRequest) throws ValidationException, NotFoundException {
-        return ResponseUtil.wrapResponse(productService.add(productRequest, file), ResponseMessage.ADD_PRODUCT_SUCCESS.getMessage());
+            @RequestParam("images") List<MultipartFile> files,
+            @RequestParam("product") String productRequest) throws ValidationException, NotFoundException {
+        return ResponseUtil.wrapResponse(productService.add(productRequest, files), ResponseMessage.ADD_PRODUCT_SUCCESS.getMessage());
     }
 
     @GetMapping("/categories/{categoryId}")
@@ -79,8 +80,8 @@ public class ProductController {
 
     @PutMapping(value = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CommonResponse<ProductDto>> update(@PathVariable Long id,
-                                                             @RequestPart("file") MultipartFile file,
-                                                             @RequestPart("product") String productRequest) throws ValidationException, NotFoundException {
-        return ResponseUtil.wrapResponse(productService.update(id, productRequest, file), ResponseMessage.UPDATE_PRODUCT_SUCCESS.getMessage());
+                                                             @RequestParam("images") List<MultipartFile> files,
+                                                             @RequestParam("product") String productRequest) throws ValidationException, NotFoundException {
+        return ResponseUtil.wrapResponse(productService.update(id, productRequest, files), ResponseMessage.UPDATE_PRODUCT_SUCCESS.getMessage());
     }
 }

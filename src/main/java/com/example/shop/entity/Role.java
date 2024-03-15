@@ -1,10 +1,9 @@
 package com.example.shop.entity;
 
-import com.example.shop.RoleType;
+import com.example.shop.constant.RoleType;
 import com.example.shop.converter.RoleTypeConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.persistence.Id;

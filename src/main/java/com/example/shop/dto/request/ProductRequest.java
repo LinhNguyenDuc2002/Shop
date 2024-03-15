@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -39,4 +42,7 @@ public class ProductRequest {
 
     @JsonProperty("note")
     private String note;
+
+    @JsonProperty("images")
+    private List<MultipartFile> images;
 }
