@@ -2,14 +2,13 @@ package com.example.shop.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import jakarta.persistence.Id;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Data
@@ -17,13 +16,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "address")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
+public class Address extends Auditor {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @UuidGenerator
+    private String id;
 
-    @Column(name = "specific_address")
-    private String specificAddress;
+    @Column(name = "detail")
+    private String detail;
 
     private String ward;
 

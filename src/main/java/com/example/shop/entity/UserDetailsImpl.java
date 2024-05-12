@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
-    private Long id;
+    private String id;
     private String username;
 
     private String password;
@@ -60,7 +60,7 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 }

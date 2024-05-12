@@ -3,6 +3,9 @@ package com.example.shop.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/**
+ * Define constants related to parameters
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ParameterConstant {
 

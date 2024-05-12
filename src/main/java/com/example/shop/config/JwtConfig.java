@@ -1,10 +1,15 @@
 package com.example.shop.config;
 
 import com.example.shop.entity.UserDetailsImpl;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -25,6 +30,7 @@ public class JwtConfig {
 
     /**
      * Create token from credentials
+     *
      * @param authentication
      * @return
      */
@@ -32,7 +38,7 @@ public class JwtConfig {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         Date now = new Date();
 
-        String token =  Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .claim("id", userPrincipal.getId())
                 .claim("authority", userPrincipal.getAuthorities())
@@ -50,15 +56,15 @@ public class JwtConfig {
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
             return true;
-        }catch(UnsupportedJwtException exp) {
+        } catch (UnsupportedJwtException exp) {
             System.out.println("claimsJws argument does not represent Claims JWS" + exp.getMessage());
-        }catch(MalformedJwtException exp) {
+        } catch (MalformedJwtException exp) {
             System.out.println("claimsJws string is not a valid JWS" + exp.getMessage());
-        }catch(SignatureException exp) {
+        } catch (SignatureException exp) {
             System.out.println("claimsJws JWS signature validation failed" + exp.getMessage());
-        }catch(ExpiredJwtException exp) {
+        } catch (ExpiredJwtException exp) {
             System.out.println("Claims has an expiration time before the method is invoked" + exp.getMessage());
-        }catch(IllegalArgumentException exp) {
+        } catch (IllegalArgumentException exp) {
             System.out.println("claimsJws string is null or empty or only whitespace" + exp.getMessage());
         }
         return false;
@@ -66,6 +72,7 @@ public class JwtConfig {
 
     /**
      * Get user information from token
+     *
      * @param token
      * @return
      */
@@ -80,6 +87,7 @@ public class JwtConfig {
 
     /**
      * Create token from credentials
+     *
      * @param authentication
      * @return
      */

@@ -2,12 +2,18 @@ package com.example.shop.entity;
 
 import com.example.shop.constant.RoleType;
 import com.example.shop.converter.RoleTypeConverter;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.persistence.Id;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Collection;
 
@@ -18,8 +24,11 @@ import java.util.Collection;
 @AllArgsConstructor
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @UuidGenerator
+    private String id;
+
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "role_name")
     @Convert(converter = RoleTypeConverter.class)
