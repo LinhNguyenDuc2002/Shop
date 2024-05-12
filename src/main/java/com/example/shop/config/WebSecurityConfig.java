@@ -9,10 +9,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,6 +30,7 @@ public class WebSecurityConfig {
 
     /**
      * Authenticate user when login
+     *
      * @param http
      * @return
      * @throws Exception
@@ -48,10 +47,10 @@ public class WebSecurityConfig {
         http.cors().and()
                 .csrf(CsrfConfigurer::disable)
                 .authorizeRequests()
-                    .requestMatchers("/api/auth","/api/users/verify").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                    .anyRequest().permitAll();
+                .requestMatchers("/api/auth", "/api/users/verify").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .anyRequest().permitAll();
 
         //filter through jwtAuthenticationFilter() before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

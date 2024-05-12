@@ -40,7 +40,6 @@ public class SchedulerManager {
         }
 
         taskScheduler.schedule(() -> {
-            taskExecutor.execute(() -> houseKeepingService.cleanTempUser());
         }, cronTrigger);
 
         log.info("Created scheduler for housekeeping: {}", cronTrigger.getExpression());

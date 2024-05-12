@@ -1,22 +1,18 @@
 package com.example.shop.mapper;
 
 import com.example.shop.dto.AddressDto;
-import com.example.shop.dto.request.AddressRequest;
 import com.example.shop.entity.Address;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface AddressMapper {
-    AddressMapper INSTANCE = Mappers.getMapper(AddressMapper.class);
+@Component
+public class AddressMapper extends AbstractMapper<Address, AddressDto> {
+    @Override
+    public Class<AddressDto> getDtoClass() {
+        return AddressDto.class;
+    }
 
-    AddressDto toDto (Address address);
-
-    Address toEntity(AddressRequest addressRequest);
-
-    @Mapping(target = "id", ignore = true)
-    void mapAddressRequestToAddress(AddressRequest addressRequest, @MappingTarget Address address);
+    @Override
+    public Class<Address> getEntityClass() {
+        return Address.class;
+    }
 }

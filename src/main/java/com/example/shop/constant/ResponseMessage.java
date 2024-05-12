@@ -66,6 +66,8 @@ public enum ResponseMessage {
 
     CATEGORY_NOT_FOUND("Category doesn't exist"),
 
+    GET_ADDRESS_SUCCESS("Get address successfully"),
+
     UPDATE_ADDRESS_SUCCESS("Update address successfully"),
 
     ITEM_NOT_FOUND("Item doesn't exist"),

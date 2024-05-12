@@ -11,12 +11,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 
+/**
+ * Config asynchronous thread
+ */
 @Configuration
 @EnableAsync //create a private thread not preventing main thread
 public class AsyncTaskConfig {
     public static final String BEAN_ASYNC_EXECUTOR = "APP_ASYNC_EXECUTOR";
 
-    private static final int DEFAULT_POOL_SIZE = 25;
+    private static final int DEFAULT_POOL_SIZE = 10;
 
     @Autowired
     private Environment env;

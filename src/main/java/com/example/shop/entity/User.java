@@ -1,19 +1,19 @@
 package com.example.shop.entity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.*;
-import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Collection;
 import java.util.Date;
@@ -24,10 +24,10 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User extends Auditor {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @UuidGenerator
+    private String id;
 
     private String username;
 
@@ -43,9 +43,6 @@ public class User {
 
     private String note;
 
-    @Column(name = "join_date")
-    private Date joinDate;
-
     private boolean status;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -57,21 +54,9 @@ public class User {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "user_roles",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Collection<Role> roles;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
-    private Collection<Comment> comments;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    @EqualsAndHashCode.Exclude
-    private Collection<Detail> details;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
-    private Collection<Bill> bills;
 }

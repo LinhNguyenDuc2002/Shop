@@ -19,6 +19,5 @@ public class ApplicationStartUpListener implements ApplicationListener<Applicati
     public void onApplicationEvent(ApplicationReadyEvent event) {
         log.info("Application started");
 
-        schedulerManager.startHouseKeepingJob();
     }
 }

@@ -6,6 +6,11 @@ import jakarta.persistence.Converter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
+/**
+ * Convert RoleType object and String
+ * when saving in DB, convert RoleType to String
+ * when mapping to Role entity, convert String to RoleType
+ */
 @Converter
 @Slf4j
 public class RoleTypeConverter implements AttributeConverter<RoleType, String> {
